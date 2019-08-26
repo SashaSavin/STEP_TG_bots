@@ -3,22 +3,25 @@ import requests
 # сделать токен внутри функции
 token = "950876534:AAHeSme1hi8gfkQwpk6UHvw0apBeasVgXkQ"
 
+# константы для удобства читаемости кода
+CUR_ABR = "Cur_Abbreviation"
+USD = 'USD'
+EUR = 'EUR'
+PLN = 'PLN'
 
-# сделать константой
 
 class Bot:
     # Опишем атрибуты класса (то, что у нас будет по умолчанию)
-
     def __init__(self, token):
         token = token
         self.url = 'https://api.telegram.org/bot{}/'.format(token)
         self.course_url = 'http://www.nbrb.by/API/ExRates/Rates?Periodicity=0'
 
-    # получаем обновления чтобы иметь доступ к остальному
     def get_updates(self):
-        method = 'getupdates'
+        method = 'getUpdates'
         response = requests.get(self.url + method)
         return response.json()
+    # получаем обновления чтобы иметь доступ к остальному
 
     # получаем сообщение, берём последние
     def get_message(self):
@@ -31,7 +34,7 @@ class Bot:
 
     # реализуем отправку сообщения
     def send_message(self, chat_id, text):
-        method = 'sendmessage'
+        method = 'sendMessage'
         params = {'chat_id': chat_id,
                   'text': text}
         response = requests.post(self.url + method, params)
@@ -41,13 +44,13 @@ class Bot:
     def get_money(self):
         response = requests.get(self.course_url).json()
         for p in list(response):
-            if p['Cur_Abbreviation'] == 'USD':
+            if p[CUR_ABR] == USD:
                 usd_price = p['Cur_OfficialRate']
-            if p['Cur_Abbreviation'] == 'EUR':
+            if p[CUR_ABR] == EUR:
                 eur_price = p['Cur_OfficialRate']
-            if p['Cur_Abbreviation'] == 'PLN':
+            if p[CUR_ABR] == 'PLN':
                 pln_price = p['Cur_OfficialRate']
-        return 'cost of one BYN today - {} USD, {} EUR, {} PLN'.format(usd_price, eur_price, pln_price)
+        return f'cost of one BYN today - {usd_price} USD, {eur_price} EUR, {pln_price} PLN'
 
     # запись последних сообщений
     def recorder(self):
@@ -57,8 +60,6 @@ class Bot:
 
 
 test_bot = Bot(token)
-test_bot.get_updates()
-
 money = test_bot.get_money()
 answer = test_bot.get_message()
 
