@@ -1,1 +1,1 @@
-# some bots from lectures
+# some bots for lectures
